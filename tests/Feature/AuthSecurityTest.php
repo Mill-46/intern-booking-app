@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -41,4 +41,15 @@ test('failed login attempt is recorded in activity logs', function () {
     expect($log)->not->toBeNull()
         ->and($log?->description)->toBe('Percobaan login gagal')
         ->and(data_get($log?->metadata, 'email_hash'))->not->toBeEmpty();
+});
+
+test('login page generates secure asset and form urls behind a proxy', function () {
+    $this->withServerVariables([
+        'HTTP_HOST' => 'intern-booking-app-production.up.railway.app',
+        'HTTP_X_FORWARDED_PROTO' => 'https',
+        'HTTP_X_FORWARDED_HOST' => 'intern-booking-app-production.up.railway.app',
+    ])->get(route('login'))
+        ->assertOk()
+        ->assertSee('https://intern-booking-app-production.up.railway.app/build/assets/', false)
+        ->assertSee('action="https://intern-booking-app-production.up.railway.app/login"', false);
 });
