@@ -3,6 +3,7 @@
 use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 
 uses(RefreshDatabase::class);
 
@@ -52,4 +53,18 @@ test('login page generates secure asset and form urls behind a proxy', function 
         ->assertOk()
         ->assertSee('https://intern-booking-app-production.up.railway.app/build/assets/', false)
         ->assertSee('action="https://intern-booking-app-production.up.railway.app/login"', false);
+});
+
+test('failed login still returns validation errors when activity log storage is unavailable', function () {
+    User::factory()->create([
+        'email' => 'admin@example.com',
+        'password' => 'password123',
+    ]);
+
+    Schema::dropIfExists('activity_logs');
+
+    $this->post(route('login.attempt'), [
+        'email' => 'admin@example.com',
+        'password' => 'wrong-password',
+    ])->assertSessionHasErrors('email');
 });
