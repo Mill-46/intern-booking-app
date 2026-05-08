@@ -136,3 +136,30 @@ Setelah service app sudah berhasil up, jalankan migrasi manual satu kali:
 php artisan migrate --force
 php artisan optimize:clear
 ```
+
+## 9) Deploy Render
+
+Gunakan service type `Docker` di Render.
+
+Render akan memakai `Dockerfile` di root repo ini, jadi:
+
+1. Jangan pilih runtime `Node`.
+2. Jangan isi `Build Command` dan `Start Command` manual di UI jika service sudah Docker.
+3. Set environment variables production seperti:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://<render-domain>
+DB_CONNECTION=pgsql
+DATABASE_URL=<DATABASE_URL_RENDER_POSTGRES>
+CACHE_STORE=file
+SESSION_DRIVER=file
+QUEUE_CONNECTION=sync
+```
+
+Setelah service berhasil hidup, jalankan migrasi:
+
+```bash
+php artisan migrate --force
+```
