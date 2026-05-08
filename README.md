@@ -109,3 +109,30 @@ Atau test minimal utama:
 ```bash
 php artisan test --compact tests/Feature/BookingApprovalFlowTest.php tests/Feature/DashboardRenderTest.php
 ```
+
+## 8) Deploy Railway (Ringkas)
+
+Gunakan `railway.toml` + `bin/start.sh` pada repo ini agar startup tidak menjalankan migrasi otomatis.
+
+Set variable minimal:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=base64:...
+APP_URL=https://<domain-railway-app>
+
+DB_CONNECTION=pgsql
+DATABASE_URL=<DATABASE_URL_DARI_SERVICE_POSTGRES_RAILWAY>
+
+CACHE_STORE=file
+SESSION_DRIVER=file
+QUEUE_CONNECTION=sync
+```
+
+Setelah service app sudah berhasil up, jalankan migrasi manual satu kali:
+
+```bash
+php artisan migrate --force
+php artisan optimize:clear
+```
